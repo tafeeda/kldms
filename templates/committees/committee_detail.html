@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>{{ committee.name }}</h1>
+        <p>{{ committee.get_committee_type_display }}</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'committee_list' %}" class="btn-white">Back</a>
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'committee_update' committee.id %}" class="btn-white">Edit</a>
+            <a href="{% url 'committee_add_member' committee.id %}" class="btn-white">Add Member</a>
+            <a href="{% url 'committee_upload_document' committee.id %}" class="btn-white">Upload Document</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="details-card">
+    <h3>Committee Information</h3>
+
+    <div class="details-grid">
+        <div>
+            <span>Committee Type</span>
+            <strong>{{ committee.get_committee_type_display }}</strong>
+        </div>
+
+        <div>
+            <span>Status</span>
+            <strong>{% if committee.is_active %}Active{% else %}Inactive{% endif %}</strong>
+        </div>
+
+        <div>
+            <span>Chairman</span>
+            <strong>{{ committee.chairman|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Vice Chairman</span>
+            <strong>{{ committee.vice_chairman|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Committee Clerk</span>
+            <strong>{{ committee.committee_clerk.get_full_name|default:committee.committee_clerk.username|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Display Order</span>
+            <strong>{{ committee.display_order }}</strong>
+        </div>
+    </div>
+
+    <h3>Description</h3>
+    <p class="bio-text">{{ committee.description|default:"No description added yet." }}</p>
+</div>
+
+<div class="dashboard-panel">
+    <h3>Committee Members</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Constituency</th>
+                    <th>Party</th>
+                    <th>Role</th>
+                    <th>Date Joined</th>
+                    <th>Status</th>
+                    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                        <th>Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for membership in committee.memberships.all %}
+                    <tr>
+                        <td>{{ membership.member }}</td>
+                        <td>{{ membership.member.constituency|default:"-" }}</td>
+                        <td>{{ membership.member.political_party.abbreviation|default:"-" }}</td>
+                        <td>{{ membership.get_role_display }}</td>
+                        <td>{{ membership.date_joined|date:"d M Y"|default:"-" }}</td>
+                        <td>
+                            {% if membership.is_active %}
+                                <span class="badge badge-success">Active</span>
+                            {% else %}
+                                <span class="badge badge-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+
+                        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                            <td>
+                                <a href="{% url 'committee_update_member' membership.id %}" class="btn-sm btn-green">Edit</a>
+                                <a href="{% url 'committee_remove_member' membership.id %}" class="btn-sm btn-dark">Remove</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">No members added to this committee yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="dashboard-panel">
+    <h3>Committee Documents</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Access</th>
+                    <th>Published</th>
+                    <th>Uploaded By</th>
+                    <th>Date</th>
+                    <th>File</th>
+                    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                        <th>Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for document in committee.documents.all %}
+                    <tr>
+                        <td>{{ document.title }}</td>
+                        <td>{{ document.get_access_level_display }}</td>
+                        <td>
+                            {% if document.is_published %}
+                                <span class="badge badge-success">Yes</span>
+                            {% else %}
+                                <span class="badge badge-danger">No</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ document.uploaded_by|default:"-" }}</td>
+                        <td>{{ document.uploaded_at|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{{ document.file.url }}" target="_blank" class="btn-sm btn-green">Open</a>
+                        </td>
+
+                        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                            <td>
+                                <a href="{% url 'committee_toggle_document_publish' document.id %}" class="btn-sm btn-dark">
+                                    {% if document.is_published %}Unpublish{% else %}Publish{% endif %}
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">No committee documents uploaded yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

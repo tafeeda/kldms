@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>System Settings</h1>
+        <p>Manage KLDMS branding, institution details, public portal text, and footer information.</p>
+    </div>
+</div>
+
+<div class="settings-preview">
+    <div class="settings-logo-box">
+        {% if setting.logo %}
+            <img src="{{ setting.logo.url }}" alt="System Logo">
+        {% else %}
+            <div>{{ setting.short_name|first }}</div>
+        {% endif %}
+    </div>
+
+    <div>
+        <h2>{{ setting.system_name }}</h2>
+        <p>{{ setting.institution_name }}</p>
+        <small>Last updated: {{ setting.updated_at|date:"d M Y, h:i A" }}</small>
+    </div>
+</div>
+
+<div class="form-card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h3>Institution Branding</h3>
+
+        <div class="form-grid">
+            {% for field in form %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small>{{ field.help_text }}</small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <div class="field-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-green-lg">Save Settings</button>
+    </form>
+</div>
+
+{% endblock %}

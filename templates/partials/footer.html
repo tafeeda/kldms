@@ -1,0 +1,16 @@
+<footer class="kldms-footer">
+    <div class="footer-left">
+        <strong>{{ system_settings.short_name|default:"KLDMS" }}</strong>
+        <span>{{ system_settings.institution_name|default:"Kano State House of Assembly" }}</span>
+    </div>
+
+    <div class="footer-center">
+        &copy; <span id="currentYear"></span>
+        {{ system_settings.footer_text|default:"Kano Legislative Digital Management System. All rights reserved." }}
+    </div>
+
+    <div class="footer-right">
+        <span>Powered by</span>
+        <strong>Mutafs Global Technology</strong>
+    </div>
+</footer>

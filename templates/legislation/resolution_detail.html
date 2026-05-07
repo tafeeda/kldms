@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>{{ resolution.resolution_number }}</h1>
+        <p>{{ resolution.title }}</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'resolution_list' %}" class="btn-white">Back</a>
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'resolution_update' resolution.id %}" class="btn-white">Edit</a>
+            <a href="{% url 'resolution_upload_document' resolution.id %}" class="btn-white">Upload Document</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="details-card">
+    <h3>Resolution Information</h3>
+
+    <div class="details-grid">
+        <div>
+            <span>Resolution Number</span>
+            <strong>{{ resolution.resolution_number }}</strong>
+        </div>
+
+        <div>
+            <span>Status</span>
+            <strong>{{ resolution.get_status_display }}</strong>
+        </div>
+
+        <div>
+            <span>Related Motion</span>
+            <strong>{{ resolution.related_motion|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Public</span>
+            <strong>{% if resolution.is_public %}Yes{% else %}No{% endif %}</strong>
+        </div>
+
+        <div>
+            <span>Date Adopted</span>
+            <strong>{{ resolution.date_adopted|date:"d M Y"|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Created By</span>
+            <strong>{{ resolution.created_by|default:"-" }}</strong>
+        </div>
+    </div>
+
+    <h3>Description</h3>
+    <p class="bio-text">{{ resolution.description }}</p>
+
+    <h3>Decision Summary</h3>
+    <p class="bio-text">{{ resolution.decision_summary|default:"No decision summary recorded yet." }}</p>
+
+    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+        <a href="{% url 'resolution_toggle_public' resolution.id %}" class="btn-green-lg">
+            {% if resolution.is_public %}Unpublish Resolution{% else %}Publish Resolution{% endif %}
+        </a>
+    {% endif %}
+</div>
+
+<div class="dashboard-panel">
+    <h3>Resolution Documents</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Public</th>
+                    <th>Uploaded By</th>
+                    <th>Date</th>
+                    <th>File</th>
+                    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                        <th>Action</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for document in resolution.documents.all %}
+                    <tr>
+                        <td>{{ document.title }}</td>
+                        <td>
+                            {% if document.is_public %}
+                                <span class="badge badge-success">Yes</span>
+                            {% else %}
+                                <span class="badge badge-danger">No</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ document.uploaded_by|default:"-" }}</td>
+                        <td>{{ document.uploaded_at|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{{ document.file.url }}" target="_blank" class="btn-sm btn-green">Open</a>
+                        </td>
+
+                        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                            <td>
+                                <a href="{% url 'resolution_toggle_document_public' document.id %}" class="btn-sm btn-dark">
+                                    {% if document.is_public %}Make Private{% else %}Make Public{% endif %}
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">No documents uploaded for this resolution yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ page_title|default:"KLDMS Public Portal" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/public.css' %}">
+</head>
+<body>
+
+<header class="public-header">
+    <div>
+        <h1>{{ system_settings.short_name }}</h1>
+        <p>{{ system_settings.system_name }}</p>
+    </div>
+
+    <nav class="public-nav">
+        <a href="{% url 'public_home' %}">Home</a>
+        <a href="{% url 'public_bills' %}">Bills</a>
+        <a href="{% url 'public_motions' %}">Motions</a>
+        <a href="{% url 'public_resolutions' %}">Resolutions</a>
+        <a href="{% url 'public_sittings' %}">Sittings</a>
+        <a href="{% url 'public_documents' %}">Documents</a>
+        <a href="{% url 'public_official_gallery' %}">Officials</a>
+        <a href="{% url 'login' %}" class="public-login-btn">Staff Login</a>
+    </nav>
+</header>
+
+{% block public_content %}{% endblock %}
+
+<footer class="public-footer">
+    &copy; <span id="currentYear"></span> {{ system_settings.footer_text }}
+</footer>
+
+<script>
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>

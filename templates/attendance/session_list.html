@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Attendance Management</h1>
+        <p>Track plenary and committee attendance records for honourable members.</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'attendance_report' %}" class="btn-white">Reports</a>
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'attendance_session_create' %}" class="btn-white">+ New Session</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="filter-card">
+    <form method="get" class="filter-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search attendance session...">
+
+        <select name="type">
+            <option value="">All Types</option>
+            {% for value, label in type_choices %}
+                <option value="{{ value }}" {% if attendance_type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+
+        {% if query or attendance_type %}
+            <a href="{% url 'attendance_session_list' %}">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Related Sitting/Committee</th>
+                    <th>Records</th>
+                    <th>Locked</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for session in sessions %}
+                    <tr>
+                        <td>{{ session.title }}</td>
+                        <td><span class="badge badge-green">{{ session.get_attendance_type_display }}</span></td>
+                        <td>{{ session.attendance_date|date:"d M Y" }}</td>
+                        <td>
+                            {% if session.attendance_type == "plenary" %}
+                                {{ session.sitting|default:"-" }}
+                            {% else %}
+                                {{ session.committee|default:"-" }}
+                            {% endif %}
+                        </td>
+                        <td>{{ session.total_records }}</td>
+                        <td>
+                            {% if session.is_locked %}
+                                <span class="badge badge-danger">Locked</span>
+                            {% else %}
+                                <span class="badge badge-success">Open</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'attendance_session_detail' session.id %}" class="btn-sm btn-green">Open</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">No attendance sessions found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

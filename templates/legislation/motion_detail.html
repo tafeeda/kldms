@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>{{ motion.motion_number }}</h1>
+        <p>{{ motion.title }}</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'motion_list' %}" class="btn-white">Back</a>
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'motion_update' motion.id %}" class="btn-white">Edit</a>
+            <a href="{% url 'motion_upload_document' motion.id %}" class="btn-white">Upload Document</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="details-card">
+    <h3>Motion Information</h3>
+
+    <div class="details-grid">
+        <div>
+            <span>Motion Number</span>
+            <strong>{{ motion.motion_number }}</strong>
+        </div>
+
+        <div>
+            <span>Status</span>
+            <strong>{{ motion.get_status_display }}</strong>
+        </div>
+
+        <div>
+            <span>Sponsor</span>
+            <strong>{{ motion.sponsor|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Public</span>
+            <strong>{% if motion.is_public %}Yes{% else %}No{% endif %}</strong>
+        </div>
+
+        <div>
+            <span>Date Moved</span>
+            <strong>{{ motion.date_moved|date:"d M Y"|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Date Decided</span>
+            <strong>{{ motion.date_decided|date:"d M Y"|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Archived</span>
+            <strong>{% if motion.is_archived %}Yes{% else %}No{% endif %}</strong>
+        </div>
+
+        <div>
+            <span>Created By</span>
+            <strong>{{ motion.created_by|default:"-" }}</strong>
+        </div>
+    </div>
+
+    <h3>Co-Sponsors</h3>
+    <p class="bio-text">
+        {% for member in motion.co_sponsors.all %}
+            {{ member }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            No co-sponsors added.
+        {% endfor %}
+    </p>
+
+    <h3>Description</h3>
+    <p class="bio-text">{{ motion.description }}</p>
+
+    <h3>Decision</h3>
+    <p class="bio-text">{{ motion.decision|default:"No decision recorded yet." }}</p>
+
+    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+        <a href="{% url 'motion_toggle_public' motion.id %}" class="btn-green-lg">
+            {% if motion.is_public %}Unpublish Motion{% else %}Publish Motion{% endif %}
+        </a>
+    {% endif %}
+</div>
+
+<div class="dashboard-panel">
+    <h3>Related Resolutions</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Resolution Number</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Public</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for resolution in motion.resolutions.all %}
+                    <tr>
+                        <td>{{ resolution.resolution_number }}</td>
+                        <td>{{ resolution.title }}</td>
+                        <td>{{ resolution.get_status_display }}</td>
+                        <td>{% if resolution.is_public %}Yes{% else %}No{% endif %}</td>
+                        <td>
+                            <a href="{% url 'resolution_detail' resolution.id %}" class="btn-sm btn-green">Open</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No resolution linked to this motion yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="dashboard-panel">
+    <h3>Motion Documents</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Public</th>
+                    <th>Uploaded By</th>
+                    <th>Date</th>
+                    <th>File</th>
+                    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                        <th>Action</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for document in motion.documents.all %}
+                    <tr>
+                        <td>{{ document.title }}</td>
+                        <td>
+                            {% if document.is_public %}
+                                <span class="badge badge-success">Yes</span>
+                            {% else %}
+                                <span class="badge badge-danger">No</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ document.uploaded_by|default:"-" }}</td>
+                        <td>{{ document.uploaded_at|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{{ document.file.url }}" target="_blank" class="btn-sm btn-green">Open</a>
+                        </td>
+
+                        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                            <td>
+                                <a href="{% url 'motion_toggle_document_public' document.id %}" class="btn-sm btn-dark">
+                                    {% if document.is_public %}Make Private{% else %}Make Public{% endif %}
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">No documents uploaded for this motion yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

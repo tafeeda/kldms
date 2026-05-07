@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>KLDMS Printable Report</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #111827;
+            margin: 0;
+            padding: 30px;
+            background: #ffffff;
+        }
+
+        .report-header {
+            border-bottom: 4px solid #0B6B3A;
+            padding-bottom: 18px;
+            margin-bottom: 25px;
+        }
+
+        .report-header h1 {
+            margin: 0;
+            color: #0B6B3A;
+        }
+
+        .report-header p {
+            margin: 6px 0 0;
+            color: #6B7280;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .report-card {
+            border: 1px solid #E5E7EB;
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .report-card span {
+            color: #0B6B3A;
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .report-card h2 {
+            margin: 8px 0;
+            font-size: 34px;
+        }
+
+        .print-btn {
+            background: #0B6B3A;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        @media print {
+            .print-btn {
+                display: none;
+            }
+
+            body {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<button onclick="window.print()" class="print-btn">Print Report</button>
+
+<div class="report-header">
+    <h1>Kano Legislative Digital Management System</h1>
+    <p>Printable Summary Report</p>
+</div>
+
+<div class="report-grid">
+    <div class="report-card">
+        <span>Total Members</span>
+        <h2>{{ total_members }}</h2>
+        <p>{{ active_members }} active members</p>
+    </div>
+
+    <div class="report-card">
+        <span>Committees</span>
+        <h2>{{ total_committees }}</h2>
+        <p>Total committees</p>
+    </div>
+
+    <div class="report-card">
+        <span>Bills</span>
+        <h2>{{ total_bills }}</h2>
+        <p>{{ passed_bills }} passed, {{ public_bills }} public</p>
+    </div>
+
+    <div class="report-card">
+        <span>Motions</span>
+        <h2>{{ total_motions }}</h2>
+        <p>{{ adopted_motions }} adopted motions</p>
+    </div>
+
+    <div class="report-card">
+        <span>Resolutions</span>
+        <h2>{{ total_resolutions }}</h2>
+        <p>Total resolutions</p>
+    </div>
+
+    <div class="report-card">
+        <span>Sittings</span>
+        <h2>{{ total_sittings }}</h2>
+        <p>Total plenary sittings</p>
+    </div>
+
+    <div class="report-card">
+        <span>Attendance Sessions</span>
+        <h2>{{ total_attendance_sessions }}</h2>
+        <p>Total attendance sessions</p>
+    </div>
+
+    <div class="report-card">
+        <span>Vote Sessions</span>
+        <h2>{{ total_vote_sessions }}</h2>
+        <p>Total vote sessions</p>
+    </div>
+
+    <div class="report-card">
+        <span>Documents</span>
+        <h2>{{ total_documents }}</h2>
+        <p>Total documents</p>
+    </div>
+
+    <div class="report-card">
+        <span>Published Officials</span>
+        <h2>{{ published_officials }}</h2>
+        <p>Officials visible to public</p>
+    </div>
+</div>
+
+</body>
+</html>

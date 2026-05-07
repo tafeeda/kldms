@@ -1,0 +1,27 @@
+{% extends "public_portal/public_base.html" %}
+
+{% block public_content %}
+
+<section class="public-page">
+    <h1>Public Documents</h1>
+    <p>Download documents approved for public access.</p>
+
+    {% include "public_portal/partials/public_search_filter.html" %}
+
+    <div class="public-list">
+        {% for document in documents %}
+            <div class="public-list-card">
+                <span>{{ document.category|default:"Document" }}</span>
+                <h3>{{ document.title }}</h3>
+                <p>{{ document.description|default:"No description available." }}</p>
+                <small>Version: {{ document.version_number }}</small>
+
+                <a href="{{ document.file.url }}" target="_blank" class="public-card-btn">Open File</a>
+            </div>
+        {% empty %}
+            <div class="public-empty">No public documents found.</div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

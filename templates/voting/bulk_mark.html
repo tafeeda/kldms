@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Bulk Mark Votes</h1>
+        <p>{{ session.vote_number }} — {{ session.title }}</p>
+    </div>
+
+    <a href="{% url 'vote_session_detail' session.id %}" class="btn-white">Back</a>
+</div>
+
+<div class="form-card">
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-grid single">
+            {% for field in form %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+
+                    {% for error in field.errors %}
+                        <div class="field-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-green-lg">Save Bulk Votes</button>
+    </form>
+</div>
+
+{% endblock %}

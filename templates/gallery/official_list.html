@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Officials Gallery Management</h1>
+        <p>Manage transitional government and assembly officials displayed to the public.</p>
+    </div>
+
+    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" or request.user.profile.role == "media_pro" %}
+        <a href="{% url 'official_create' %}" class="btn-white">+ Add Official</a>
+    {% endif %}
+</div>
+
+<div class="filter-card">
+    <form method="get" class="filter-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search name, position, constituency, party...">
+
+        <select name="category">
+            <option value="">All Categories</option>
+            {% for value, label in category_choices %}
+                <option value="{{ value }}" {% if category == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="status">
+            <option value="">All Status</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+
+        {% if query or category or status %}
+            <a href="{% url 'official_list' %}">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="official-grid">
+    {% for official in officials %}
+        <div class="official-card">
+            <div class="official-photo-wrap">
+                {% if official.photo %}
+                    <img src="{{ official.photo.url }}" alt="{{ official.full_name }}">
+                {% else %}
+                    <div class="official-placeholder">
+                        {{ official.full_name|first|upper }}
+                    </div>
+                {% endif %}
+
+                {% if official.status == "current" %}
+                    <span class="status-pill status-active">Current</span>
+                {% else %}
+                    <span class="status-pill status-former">Former</span>
+                {% endif %}
+            </div>
+
+            <div class="official-card-body">
+                <span class="official-category">{{ official.get_category_display }}</span>
+                <h3>{{ official.full_name }}</h3>
+                <p>{{ official.position_title }}</p>
+
+                <div class="member-meta">
+                    <span>Constituency: {{ official.constituency|default:"-" }}</span>
+                    <span>Party: {{ official.political_party.abbreviation|default:"-" }}</span>
+                    <span>Published: {% if official.is_published %}Yes{% else %}No{% endif %}</span>
+                </div>
+
+                <a href="{% url 'official_detail' official.id %}" class="btn-green-full">View Profile</a>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            No official profiles found.
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

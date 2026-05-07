@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>{{ bill.bill_number }}</h1>
+        <p>{{ bill.title }}</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'bill_list' %}" class="btn-white">Back</a>
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'bill_update' bill.id %}" class="btn-white">Edit</a>
+            <a href="{% url 'bill_add_reading' bill.id %}" class="btn-white">Add Reading</a>
+            <a href="{% url 'bill_add_amendment' bill.id %}" class="btn-white">Add Amendment</a>
+            <a href="{% url 'bill_upload_document' bill.id %}" class="btn-white">Upload Document</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="details-card">
+    <h3>Bill Information</h3>
+
+    <div class="details-grid">
+        <div>
+            <span>Bill Number</span>
+            <strong>{{ bill.bill_number }}</strong>
+        </div>
+
+        <div>
+            <span>Status</span>
+            <strong>{{ bill.get_status_display }}</strong>
+        </div>
+
+        <div>
+            <span>Sponsor</span>
+            <strong>{{ bill.sponsor|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Public</span>
+            <strong>{% if bill.is_public %}Yes{% else %}No{% endif %}</strong>
+        </div>
+
+        <div>
+            <span>Date Introduced</span>
+            <strong>{{ bill.date_introduced|date:"d M Y"|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Date Passed</span>
+            <strong>{{ bill.date_passed|date:"d M Y"|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Date Assented</span>
+            <strong>{{ bill.date_assented|date:"d M Y"|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Archived</span>
+            <strong>{% if bill.is_archived %}Yes{% else %}No{% endif %}</strong>
+        </div>
+    </div>
+
+    <h3>Co-Sponsors</h3>
+    <p class="bio-text">
+        {% for member in bill.co_sponsors.all %}
+            {{ member }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            No co-sponsors added.
+        {% endfor %}
+    </p>
+
+    <h3>Summary</h3>
+    <p class="bio-text">{{ bill.summary|default:"No summary added." }}</p>
+
+    <h3>Long Title</h3>
+    <p class="bio-text">{{ bill.long_title|default:"No long title added." }}</p>
+
+    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+        <a href="{% url 'bill_toggle_public' bill.id %}" class="btn-green-lg">
+            {% if bill.is_public %}Unpublish Bill{% else %}Publish Bill{% endif %}
+        </a>
+    {% endif %}
+</div>
+
+<div class="dashboard-panel">
+    <h3>Bill Readings</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Reading</th>
+                    <th>Date</th>
+                    <th>Notes</th>
+                    <th>Recorded By</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for reading in bill.readings.all %}
+                    <tr>
+                        <td>{{ reading.get_reading_type_display }}</td>
+                        <td>{{ reading.reading_date|date:"d M Y" }}</td>
+                        <td>{{ reading.notes|default:"-" }}</td>
+                        <td>{{ reading.recorded_by|default:"-" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">No reading recorded yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="dashboard-panel">
+    <h3>Amendments</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Proposed By</th>
+                    <th>Date</th>
+                    <th>Approved</th>
+                    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                        <th>Action</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for amendment in bill.amendments.all %}
+                    <tr>
+                        <td>{{ amendment.title }}</td>
+                        <td>{{ amendment.proposed_by|default:"-" }}</td>
+                        <td>{{ amendment.amendment_date|date:"d M Y"|default:"-" }}</td>
+                        <td>
+                            {% if amendment.is_approved %}
+                                <span class="badge badge-success">Yes</span>
+                            {% else %}
+                                <span class="badge badge-danger">No</span>
+                            {% endif %}
+                        </td>
+
+                        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                            <td>
+                                <a href="{% url 'bill_update_amendment' amendment.id %}" class="btn-sm btn-green">Edit</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No amendments added yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="dashboard-panel">
+    <h3>Bill Documents</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Public</th>
+                    <th>Uploaded By</th>
+                    <th>Date</th>
+                    <th>File</th>
+                    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                        <th>Action</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for document in bill.documents.all %}
+                    <tr>
+                        <td>{{ document.title }}</td>
+                        <td>
+                            {% if document.is_public %}
+                                <span class="badge badge-success">Yes</span>
+                            {% else %}
+                                <span class="badge badge-danger">No</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ document.uploaded_by|default:"-" }}</td>
+                        <td>{{ document.uploaded_at|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{{ document.file.url }}" target="_blank" class="btn-sm btn-green">Open</a>
+                        </td>
+
+                        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                            <td>
+                                <a href="{% url 'bill_toggle_document_public' document.id %}" class="btn-sm btn-dark">
+                                    {% if document.is_public %}Make Private{% else %}Make Public{% endif %}
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">No documents uploaded for this bill yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

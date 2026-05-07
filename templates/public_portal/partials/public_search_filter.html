@@ -1,0 +1,8 @@
+<form method="get" class="public-inline-search">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search this section...">
+    <button type="submit">Search</button>
+
+    {% if query %}
+        <a href=".">Clear</a>
+    {% endif %}
+</form>

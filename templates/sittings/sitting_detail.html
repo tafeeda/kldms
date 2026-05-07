@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>{{ sitting.sitting_number }}</h1>
+        <p>{{ sitting.title }}</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'sitting_list' %}" class="btn-white">Back</a>
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'sitting_update' sitting.id %}" class="btn-white">Edit</a>
+            <a href="{% url 'agenda_add' sitting.id %}" class="btn-white">Add Agenda</a>
+            <a href="{% url 'order_paper_manage' sitting.id %}" class="btn-white">Order Paper</a>
+            <a href="{% url 'votes_proceeding_manage' sitting.id %}" class="btn-white">Votes & Proceedings</a>
+            <a href="{% url 'hansard_manage' sitting.id %}" class="btn-white">Hansard</a>
+            <a href="{% url 'sitting_upload_document' sitting.id %}" class="btn-white">Upload Document</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="details-card">
+    <h3>Sitting Information</h3>
+
+    <div class="details-grid">
+        <div>
+            <span>Sitting Number</span>
+            <strong>{{ sitting.sitting_number }}</strong>
+        </div>
+
+        <div>
+            <span>Status</span>
+            <strong>{{ sitting.get_status_display }}</strong>
+        </div>
+
+        <div>
+            <span>Date</span>
+            <strong>{{ sitting.sitting_date|date:"d M Y" }}</strong>
+        </div>
+
+        <div>
+            <span>Time</span>
+            <strong>
+                {{ sitting.start_time|time:"h:i A"|default:"-" }}
+                {% if sitting.end_time %} - {{ sitting.end_time|time:"h:i A" }}{% endif %}
+            </strong>
+        </div>
+
+        <div>
+            <span>Venue</span>
+            <strong>{{ sitting.venue }}</strong>
+        </div>
+
+        <div>
+            <span>Public</span>
+            <strong>{% if sitting.is_public %}Yes{% else %}No{% endif %}</strong>
+        </div>
+    </div>
+
+    <h3>Description</h3>
+    <p class="bio-text">{{ sitting.description|default:"No description added." }}</p>
+
+    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+        <a href="{% url 'sitting_toggle_public' sitting.id %}" class="btn-green-lg">
+            {% if sitting.is_public %}Unpublish Sitting{% else %}Publish Sitting{% endif %}
+        </a>
+    {% endif %}
+</div>
+
+<div class="dashboard-panel">
+    <h3>Agenda Items</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Title</th>
+                    <th>Presenter</th>
+                    <th>Status</th>
+                    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                        <th>Action</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for agenda in sitting.agenda_items.all %}
+                    <tr>
+                        <td>{{ agenda.order_number }}</td>
+                        <td>
+                            <strong>{{ agenda.title }}</strong><br>
+                            <small>{{ agenda.description|truncatechars:100 }}</small>
+                        </td>
+                        <td>{{ agenda.presenter|default:"-" }}</td>
+                        <td>
+                            {% if agenda.is_completed %}
+                                <span class="badge badge-success">Completed</span>
+                            {% else %}
+                                <span class="badge badge-green">Pending</span>
+                            {% endif %}
+                        </td>
+
+                        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                            <td>
+                                <a href="{% url 'agenda_update' agenda.id %}" class="btn-sm btn-green">Edit</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No agenda item added yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="sitting-doc-grid">
+    <div class="mini-doc-card">
+        <h3>Order Paper</h3>
+        {% if sitting.order_paper %}
+            <p>{{ sitting.order_paper.title }}</p>
+            <span class="badge {% if sitting.order_paper.is_published %}badge-success{% else %}badge-danger{% endif %}">
+                {% if sitting.order_paper.is_published %}Published{% else %}Unpublished{% endif %}
+            </span>
+            {% if sitting.order_paper.file %}
+                <a href="{{ sitting.order_paper.file.url }}" target="_blank" class="btn-green-full">Open File</a>
+            {% endif %}
+        {% else %}
+            <p>No order paper prepared yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="mini-doc-card">
+        <h3>Votes & Proceedings</h3>
+        {% if sitting.votes_proceeding %}
+            <p>{{ sitting.votes_proceeding.title }}</p>
+            <span class="badge {% if sitting.votes_proceeding.is_published %}badge-success{% else %}badge-danger{% endif %}">
+                {% if sitting.votes_proceeding.is_published %}Published{% else %}Unpublished{% endif %}
+            </span>
+            {% if sitting.votes_proceeding.file %}
+                <a href="{{ sitting.votes_proceeding.file.url }}" target="_blank" class="btn-green-full">Open File</a>
+            {% endif %}
+        {% else %}
+            <p>No votes and proceedings prepared yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="mini-doc-card">
+        <h3>Hansard</h3>
+        {% if sitting.hansard %}
+            <p>{{ sitting.hansard.title }}</p>
+            <span class="badge {% if sitting.hansard.is_published %}badge-success{% else %}badge-danger{% endif %}">
+                {% if sitting.hansard.is_published %}Published{% else %}Unpublished{% endif %}
+            </span>
+            {% if sitting.hansard.file %}
+                <a href="{{ sitting.hansard.file.url }}" target="_blank" class="btn-green-full">Open File</a>
+            {% endif %}
+        {% else %}
+            <p>No hansard/transcript prepared yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="dashboard-panel">
+    <h3>Sitting Documents</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Public</th>
+                    <th>Uploaded By</th>
+                    <th>Date</th>
+                    <th>File</th>
+                    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                        <th>Action</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for document in sitting.documents.all %}
+                    <tr>
+                        <td>{{ document.title }}</td>
+                        <td>
+                            {% if document.is_public %}
+                                <span class="badge badge-success">Yes</span>
+                            {% else %}
+                                <span class="badge badge-danger">No</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ document.uploaded_by|default:"-" }}</td>
+                        <td>{{ document.uploaded_at|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{{ document.file.url }}" target="_blank" class="btn-sm btn-green">Open</a>
+                        </td>
+
+                        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                            <td>
+                                <a href="{% url 'sitting_toggle_document_public' document.id %}" class="btn-sm btn-dark">
+                                    {% if document.is_public %}Make Private{% else %}Make Public{% endif %}
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">No sitting documents uploaded yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

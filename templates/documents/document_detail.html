@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>{{ document.title }}</h1>
+        <p>{{ document.category|default:"Uncategorized" }}</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'document_list' %}" class="btn-white">Back</a>
+        <a href="{% url 'document_download' document.id %}" class="btn-white">Download</a>
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'document_update' document.id %}" class="btn-white">Edit</a>
+            <a href="{% url 'document_add_version' document.id %}" class="btn-white">Add Version</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="details-card">
+    <h3>Document Information</h3>
+
+    <div class="details-grid">
+        <div>
+            <span>Category</span>
+            <strong>{{ document.category|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Access Level</span>
+            <strong>{{ document.get_access_level_display }}</strong>
+        </div>
+
+        <div>
+            <span>Published</span>
+            <strong>{% if document.is_published %}Yes{% else %}No{% endif %}</strong>
+        </div>
+
+        <div>
+            <span>Current Version</span>
+            <strong>{{ document.version_number }}</strong>
+        </div>
+
+        <div>
+            <span>Uploaded By</span>
+            <strong>{{ document.uploaded_by|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Uploaded At</span>
+            <strong>{{ document.created_at|date:"d M Y, h:i A" }}</strong>
+        </div>
+    </div>
+
+    <h3>Description</h3>
+    <p class="bio-text">{{ document.description|default:"No description added." }}</p>
+
+    <a href="{{ document.file.url }}" target="_blank" class="btn-green-lg">Open File</a>
+
+    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+        <a href="{% url 'document_toggle_publish' document.id %}" class="btn-green-lg">
+            {% if document.is_published %}Unpublish{% else %}Publish{% endif %}
+        </a>
+    {% endif %}
+</div>
+
+<div class="dashboard-panel">
+    <h3>Document Versions</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Version</th>
+                    <th>Notes</th>
+                    <th>Uploaded By</th>
+                    <th>Date</th>
+                    <th>File</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for version in document.versions.all %}
+                    <tr>
+                        <td>Version {{ version.version_number }}</td>
+                        <td>{{ version.notes|default:"-" }}</td>
+                        <td>{{ version.uploaded_by|default:"-" }}</td>
+                        <td>{{ version.uploaded_at|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{{ version.file.url }}" target="_blank" class="btn-sm btn-green">Open</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No extra versions uploaded yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if request.user.profile.role == "super_admin" %}
+<div class="dashboard-panel">
+    <h3>Recent Access Logs</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>IP Address</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for access in document.access_logs.all|slice:":10" %}
+                    <tr>
+                        <td>{{ access.user|default:"Public/Anonymous" }}</td>
+                        <td>{{ access.get_action_display }}</td>
+                        <td>{{ access.ip_address|default:"-" }}</td>
+                        <td>{{ access.created_at|date:"d M Y, h:i A" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">No access logs yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "public_portal/public_base.html" %}
+
+{% block public_content %}
+
+<section class="public-page">
+    <h1>Public Search</h1>
+    <p>Search published public records.</p>
+
+    <form method="get" class="public-inline-search">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search public records..." required>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if query %}
+        <h2>Results for: "{{ query }}"</h2>
+
+        <div class="public-list">
+            {% for bill in bills %}
+                <div class="public-list-card">
+                    <span>Bill</span>
+                    <h3>{{ bill.bill_number }}</h3>
+                    <h4>{{ bill.title }}</h4>
+                    <p>{{ bill.summary|truncatechars:180 }}</p>
+                </div>
+            {% endfor %}
+
+            {% for motion in motions %}
+                <div class="public-list-card">
+                    <span>Motion</span>
+                    <h3>{{ motion.motion_number }}</h3>
+                    <h4>{{ motion.title }}</h4>
+                    <p>{{ motion.description|truncatechars:180 }}</p>
+                </div>
+            {% endfor %}
+
+            {% for resolution in resolutions %}
+                <div class="public-list-card">
+                    <span>Resolution</span>
+                    <h3>{{ resolution.resolution_number }}</h3>
+                    <h4>{{ resolution.title }}</h4>
+                    <p>{{ resolution.description|truncatechars:180 }}</p>
+                </div>
+            {% endfor %}
+
+            {% for sitting in sittings %}
+                <div class="public-list-card">
+                    <span>Sitting</span>
+                    <h3>{{ sitting.sitting_number }}</h3>
+                    <h4>{{ sitting.title }}</h4>
+                    <p>{{ sitting.description|truncatechars:180 }}</p>
+                </div>
+            {% endfor %}
+
+            {% for document in documents %}
+                <div class="public-list-card">
+                    <span>Document</span>
+                    <h3>{{ document.title }}</h3>
+                    <p>{{ document.description|truncatechars:180 }}</p>
+                    <a href="{{ document.file.url }}" target="_blank" class="public-card-btn">Open File</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}

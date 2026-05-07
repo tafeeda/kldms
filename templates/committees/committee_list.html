@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Committees</h1>
+        <p>Manage standing, special, and ad-hoc committees of the House.</p>
+    </div>
+
+    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+        <a href="{% url 'committee_create' %}" class="btn-white">+ Add Committee</a>
+    {% endif %}
+</div>
+
+<div class="filter-card">
+    <form method="get" class="filter-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search committee, chairman, vice chairman...">
+        <button type="submit">Search</button>
+        {% if query %}
+            <a href="{% url 'committee_list' %}">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="committee-grid">
+    {% for committee in committees %}
+        <div class="committee-card">
+            <div class="committee-top">
+                <span class="committee-type">{{ committee.get_committee_type_display }}</span>
+
+                {% if committee.is_active %}
+                    <span class="badge badge-success">Active</span>
+                {% else %}
+                    <span class="badge badge-danger">Inactive</span>
+                {% endif %}
+            </div>
+
+            <h3>{{ committee.name }}</h3>
+
+            <p>{{ committee.description|truncatechars:130|default:"No description added yet." }}</p>
+
+            <div class="committee-meta">
+                <div>
+                    <span>Chairman</span>
+                    <strong>{{ committee.chairman|default:"-" }}</strong>
+                </div>
+
+                <div>
+                    <span>Vice Chairman</span>
+                    <strong>{{ committee.vice_chairman|default:"-" }}</strong>
+                </div>
+
+                <div>
+                    <span>Clerk</span>
+                    <strong>{{ committee.committee_clerk.get_full_name|default:committee.committee_clerk.username|default:"-" }}</strong>
+                </div>
+
+                <div>
+                    <span>Members</span>
+                    <strong>{{ committee.memberships.count }}</strong>
+                </div>
+            </div>
+
+            <a href="{% url 'committee_detail' committee.id %}" class="btn-green-full">View Committee</a>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            No committees found.
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

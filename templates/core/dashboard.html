@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>KLDMS Dashboard</h1>
+        <p>
+            Welcome, {{ request.user.get_full_name|default:request.user.username }}.
+            Role: {{ profile.get_role_display }}
+        </p>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="dashboard-card">
+        <span class="card-label">Total Members</span>
+        <h2>{{ total_members }}</h2>
+        <p>Honourable members registered</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Active Members</span>
+        <h2>{{ active_members }}</h2>
+        <p>Currently serving members</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Constituencies</span>
+        <h2>{{ total_constituencies }}</h2>
+        <p>Registered constituencies</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Political Parties</span>
+        <h2>{{ total_parties }}</h2>
+        <p>Registered political parties</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Active Bills</span>
+        <h2>{{ active_bills }}</h2>
+        <p>Bills currently in workflow</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Public Bills</span>
+        <h2>{{ public_bills }}</h2>
+        <p>Bills visible to citizens</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Passed Bills</span>
+        <h2>{{ passed_bills }}</h2>
+        <p>Bills passed by the House</p>
+    </div>
+</div>
+
+
+
+<div class="dashboard-panel">
+    <h3>Role-Based Access</h3>
+    <p>
+        Your dashboard and menu items are controlled by your assigned role.
+        Sensitive modules will remain hidden or blocked unless your role permits access.
+    </p>
+</div>
+
+{% if request.user.profile.role == "super_admin" %}
+<div class="dashboard-panel">
+    <h3>Recent Audit Activities</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Actor</th>
+                    <th>Action</th>
+                    <th>Module</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for log in recent_logs %}
+                    <tr>
+                        <td>{{ log.actor|default:"System" }}</td>
+                        <td>{{ log.get_action_display }}</td>
+                        <td>{{ log.module }}</td>
+                        <td>{{ log.description|truncatechars:70 }}</td>
+                        <td>{{ log.created_at|date:"d M Y, h:i A" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No audit activity yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

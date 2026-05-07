@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>KLDMS Public Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/public.css' %}">
+</head>
+<body>
+
+<header class="public-header">
+    <div>
+        <h1>{{ system_settings.short_name }}</h1>
+        <p>{{ system_settings.system_name }}</p>
+    </div>
+
+    <nav class="public-nav">
+        <a href="{% url 'public_home' %}">Home</a>
+        <a href="{% url 'public_bills' %}">Bills</a>
+        <a href="{% url 'public_motions' %}">Motions</a>
+        <a href="{% url 'public_resolutions' %}">Resolutions</a>
+        <a href="{% url 'public_sittings' %}">Sittings</a>
+        <a href="{% url 'public_documents' %}">Documents</a>
+        <a href="{% url 'login' %}" class="public-login-btn">Staff Login</a>
+    </nav>
+</header>
+
+<section class="public-hero">
+    <h2>{{ system_settings.public_hero_title }}</h2>
+    <p>{{ system_settings.public_hero_subtitle }}</p>
+
+    <form action="{% url 'public_search' %}" method="get" class="public-search-box">
+        <input type="text" name="q" placeholder="Search public records..." required>
+        <button type="submit">Search</button>
+    </form>
+</section>
+
+<section class="public-stats">
+    <div>
+        <strong>{{ public_bills_count }}</strong>
+        <span>Published Bills</span>
+    </div>
+
+    <div>
+        <strong>{{ public_motions_count }}</strong>
+        <span>Published Motions</span>
+    </div>
+
+    <div>
+        <strong>{{ public_resolutions_count }}</strong>
+        <span>Published Resolutions</span>
+    </div>
+
+    <div>
+        <strong>{{ public_sittings_count }}</strong>
+        <span>Published Sittings</span>
+    </div>
+
+    <div>
+        <strong>{{ public_documents_count }}</strong>
+        <span>Public Documents</span>
+    </div>
+</section>
+
+<section class="public-cards">
+    <a href="{% url 'public_bills' %}" class="public-card">
+        <h3>Published Bills</h3>
+        <p>View bills approved for public access.</p>
+    </a>
+
+    <a href="{% url 'public_motions' %}" class="public-card">
+        <h3>Motions</h3>
+        <p>View public motions and decisions.</p>
+    </a>
+
+    <a href="{% url 'public_resolutions' %}" class="public-card">
+        <h3>Resolutions</h3>
+        <p>View adopted public resolutions.</p>
+    </a>
+
+    <a href="{% url 'public_sittings' %}" class="public-card">
+        <h3>Plenary Sittings</h3>
+        <p>View published sittings and legislative events.</p>
+    </a>
+
+    <a href="{% url 'public_documents' %}" class="public-card">
+        <h3>Public Documents</h3>
+        <p>Download public transparency documents.</p>
+    </a>
+
+    <a href="{% url 'public_official_gallery' %}" class="public-card">
+        <h3>Officials Gallery</h3>
+        <p>View transitional pictures and profiles of government and assembly officials.</p>
+    </a>
+</section>
+
+<footer class="public-footer">
+    &copy; <span id="currentYear"></span> {{ system_settings.footer_text }}
+</footer>
+
+<script>
+    document.getElementById("currentYear").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>

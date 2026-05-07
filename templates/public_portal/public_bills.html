@@ -1,0 +1,26 @@
+{% extends "public_portal/public_base.html" %}
+
+{% block public_content %}
+
+<section class="public-page">
+    <h1>Published Bills</h1>
+    <p>Public bills approved for citizen access.</p>
+
+    {% include "public_portal/partials/public_search_filter.html" %}
+
+    <div class="public-list">
+        {% for bill in bills %}
+            <div class="public-list-card">
+                <span>Bill</span>
+                <h3>{{ bill.bill_number }}</h3>
+                <h4>{{ bill.title }}</h4>
+                <p>{{ bill.summary|default:"No summary available." }}</p>
+                <small>Sponsor: {{ bill.sponsor|default:"-" }} | Status: {{ bill.get_status_display }}</small>
+            </div>
+        {% empty %}
+            <div class="public-empty">No published bills found.</div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

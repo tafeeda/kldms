@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Document Categories</h1>
+        <p>Manage document grouping for the central library.</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'document_list' %}" class="btn-white">Back to Documents</a>
+        <a href="{% url 'category_create' %}" class="btn-white">+ Add Category</a>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Documents</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for category in categories %}
+                    <tr>
+                        <td>{{ category.name }}</td>
+                        <td>{{ category.description|truncatechars:80|default:"-" }}</td>
+                        <td>{{ category.total_documents }}</td>
+                        <td>
+                            {% if category.is_active %}
+                                <span class="badge badge-success">Active</span>
+                            {% else %}
+                                <span class="badge badge-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ category.created_at|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{% url 'category_update' category.id %}" class="btn-sm btn-green">Edit</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">No categories found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

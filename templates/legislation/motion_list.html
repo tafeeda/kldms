@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Motions</h1>
+        <p>Manage legislative motions, sponsors, decisions, and supporting documents.</p>
+    </div>
+
+    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+        <a href="{% url 'motion_create' %}" class="btn-white">+ Add Motion</a>
+    {% endif %}
+</div>
+
+<div class="filter-card">
+    <form method="get" class="filter-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search motion title, number, sponsor...">
+
+        <select name="status">
+            <option value="">All Status</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+
+        {% if query or status %}
+            <a href="{% url 'motion_list' %}">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Motion Number</th>
+                    <th>Title</th>
+                    <th>Sponsor</th>
+                    <th>Status</th>
+                    <th>Public</th>
+                    <th>Date Moved</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for motion in motions %}
+                    <tr>
+                        <td>{{ motion.motion_number }}</td>
+                        <td>{{ motion.title }}</td>
+                        <td>{{ motion.sponsor|default:"-" }}</td>
+                        <td><span class="badge badge-green">{{ motion.get_status_display }}</span></td>
+                        <td>
+                            {% if motion.is_public %}
+                                <span class="badge badge-success">Yes</span>
+                            {% else %}
+                                <span class="badge badge-danger">No</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ motion.date_moved|date:"d M Y"|default:"-" }}</td>
+                        <td>
+                            <a href="{% url 'motion_detail' motion.id %}" class="btn-sm btn-green">Open</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">No motions found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

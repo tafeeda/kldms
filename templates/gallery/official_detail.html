@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>{{ official.full_name }}</h1>
+        <p>{{ official.position_title }}</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'official_list' %}" class="btn-white">Back</a>
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" or request.user.profile.role == "media_pro" %}
+            <a href="{% url 'official_update' official.id %}" class="btn-white">Edit</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="profile-layout">
+    <div class="profile-card">
+        {% if official.photo %}
+            <img src="{{ official.photo.url }}" alt="{{ official.full_name }}" class="profile-main-photo">
+        {% else %}
+            <div class="profile-main-placeholder">
+                {{ official.full_name|first|upper }}
+            </div>
+        {% endif %}
+
+        <h2>{{ official.full_name }}</h2>
+        <p>{{ official.position_title }}</p>
+
+        {% if official.status == "current" %}
+            <span class="badge badge-success">Current</span>
+        {% else %}
+            <span class="badge badge-green">Former</span>
+        {% endif %}
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" or request.user.profile.role == "media_pro" %}
+            <a href="{% url 'official_toggle_publish' official.id %}" class="btn-green-full">
+                {% if official.is_published %}Unpublish{% else %}Publish{% endif %}
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="details-card">
+        <h3>Official Information</h3>
+
+        <div class="details-grid">
+            <div>
+                <span>Category</span>
+                <strong>{{ official.get_category_display }}</strong>
+            </div>
+
+            <div>
+                <span>Status</span>
+                <strong>{{ official.get_status_display }}</strong>
+            </div>
+
+            <div>
+                <span>Constituency</span>
+                <strong>{{ official.constituency|default:"-" }}</strong>
+            </div>
+
+            <div>
+                <span>Political Party</span>
+                <strong>{{ official.political_party|default:"-" }}</strong>
+            </div>
+
+            <div>
+                <span>Start Date</span>
+                <strong>{{ official.start_date|date:"d M Y"|default:"-" }}</strong>
+            </div>
+
+            <div>
+                <span>End Date</span>
+                <strong>{{ official.end_date|date:"d M Y"|default:"-" }}</strong>
+            </div>
+
+            <div>
+                <span>Display Order</span>
+                <strong>{{ official.display_order }}</strong>
+            </div>
+
+            <div>
+                <span>Published</span>
+                <strong>{% if official.is_published %}Yes{% else %}No{% endif %}</strong>
+            </div>
+        </div>
+
+        <h3>Biography/Profile</h3>
+        <p class="bio-text">{{ official.short_biography|default:"No biography added yet." }}</p>
+    </div>
+</div>
+
+{% endblock %}

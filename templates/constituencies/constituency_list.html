@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Constituencies</h1>
+        <p>Manage Kano State House of Assembly constituencies.</p>
+    </div>
+
+    <a href="{% url 'constituency_create' %}" class="btn-white">+ Add Constituency</a>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Local Government</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th style="width: 120px;">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for constituency in constituencies %}
+                    <tr>
+                        <td>{{ constituency.name }}</td>
+                        <td>{{ constituency.local_government }}</td>
+                        <td>
+                            {% if constituency.is_active %}
+                                <span class="badge badge-success">Active</span>
+                            {% else %}
+                                <span class="badge badge-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ constituency.created_at|date:"d M Y" }}</td>
+                        <td>
+                            <a href="{% url 'constituency_update' constituency.id %}" class="btn-sm btn-green">Edit</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No constituencies found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

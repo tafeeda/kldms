@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Electronic Voting</h1>
+        <p>Manage vote sessions, division voting, voice votes, decisions, and result summaries.</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'vote_report' %}" class="btn-white">Reports</a>
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'vote_session_create' %}" class="btn-white">+ New Vote</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="filter-card">
+    <form method="get" class="filter-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search vote title, number, bill, motion...">
+
+        <select name="type">
+            <option value="">All Types</option>
+            {% for value, label in type_choices %}
+                <option value="{{ value }}" {% if vote_type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="outcome">
+            <option value="">All Outcomes</option>
+            {% for value, label in outcome_choices %}
+                <option value="{{ value }}" {% if outcome == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+
+        {% if query or vote_type or outcome %}
+            <a href="{% url 'vote_session_list' %}">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Vote Number</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Method</th>
+                    <th>Outcome</th>
+                    <th>Date</th>
+                    <th>Records</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for session in sessions %}
+                    <tr>
+                        <td>{{ session.vote_number }}</td>
+                        <td>{{ session.title }}</td>
+                        <td><span class="badge badge-green">{{ session.get_vote_type_display }}</span></td>
+                        <td>{{ session.get_vote_method_display }}</td>
+                        <td>
+                            {% if session.outcome == "carried" %}
+                                <span class="badge badge-success">Carried</span>
+                            {% elif session.outcome == "negatived" %}
+                                <span class="badge badge-danger">Negatived</span>
+                            {% elif session.outcome == "tied" %}
+                                <span class="badge badge-green">Tied</span>
+                            {% else %}
+                                <span class="badge badge-green">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ session.vote_date|date:"d M Y" }}</td>
+                        <td>{{ session.total_records }}</td>
+                        <td>
+                            {% if session.is_locked %}
+                                <span class="badge badge-danger">Locked</span>
+                            {% elif session.is_open %}
+                                <span class="badge badge-success">Open</span>
+                            {% else %}
+                                <span class="badge badge-danger">Closed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'vote_session_detail' session.id %}" class="btn-sm btn-green">Open</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="9">No vote sessions found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

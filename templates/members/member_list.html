@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Honourable Members</h1>
+        <p>Manage profiles of honourable members of Kano State House of Assembly.</p>
+    </div>
+
+    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+        <a href="{% url 'member_create' %}" class="btn-white">+ Add Member</a>
+    {% endif %}
+</div>
+
+<div class="filter-card">
+    <form method="get" class="filter-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search by name, constituency, party, position...">
+        <button type="submit">Search</button>
+        {% if query %}
+            <a href="{% url 'member_list' %}">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="member-grid">
+    {% for member in members %}
+        <div class="member-card">
+            <div class="member-photo-wrap">
+                {% if member.photo %}
+                    <img src="{{ member.photo.url }}" alt="{{ member.full_name }}">
+                {% else %}
+                    <div class="member-placeholder">
+                        {{ member.first_name|first }}{{ member.last_name|first }}
+                    </div>
+                {% endif %}
+
+                {% if member.status == "active" %}
+                    <span class="status-pill status-active">Active</span>
+                {% elif member.status == "former" %}
+                    <span class="status-pill status-former">Former</span>
+                {% else %}
+                    <span class="status-pill status-danger">Suspended</span>
+                {% endif %}
+            </div>
+
+            <div class="member-card-body">
+                <h3>{{ member.full_name }}</h3>
+                <p class="member-position">{{ member.position_title|default:"Honourable Member" }}</p>
+
+                <div class="member-meta">
+                    <span>Constituency: {{ member.constituency|default:"-" }}</span>
+                    <span>Party: {{ member.political_party.abbreviation|default:"-" }}</span>
+                </div>
+
+                <a href="{% url 'member_detail' member.id %}" class="btn-green-full">View Profile</a>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            No honourable members found.
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

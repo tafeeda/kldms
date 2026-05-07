@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Document Library</h1>
+        <p>Central repository for legislative, administrative, public, and restricted documents.</p>
+    </div>
+
+    <div class="header-actions">
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'category_list' %}" class="btn-white">Categories</a>
+            <a href="{% url 'document_create' %}" class="btn-white">+ Upload Document</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="filter-card">
+    <form method="get" class="filter-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search document title, category, description...">
+
+        <select name="category">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if category_id == category.id|stringformat:"s" %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="access">
+            <option value="">All Access</option>
+            {% for value, label in access_choices %}
+                <option value="{{ value }}" {% if access_level == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+
+        {% if query or category_id or access_level %}
+            <a href="{% url 'document_list' %}">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="document-grid">
+    {% for document in documents %}
+        <div class="document-card">
+            <div class="document-icon">📄</div>
+
+            <div class="document-body">
+                <span class="document-category">
+                    {{ document.category|default:"Uncategorized" }}
+                </span>
+
+                <h3>{{ document.title }}</h3>
+                <p>{{ document.description|truncatechars:120|default:"No description added." }}</p>
+
+                <div class="document-meta">
+                    <span>Access: {{ document.get_access_level_display }}</span>
+                    <span>Version: {{ document.version_number }}</span>
+                    <span>Versions: {{ document.total_versions }}</span>
+                </div>
+
+                <div class="document-badges">
+                    {% if document.is_published %}
+                        <span class="badge badge-success">Published</span>
+                    {% else %}
+                        <span class="badge badge-danger">Unpublished</span>
+                    {% endif %}
+
+                    {% if document.access_level == "restricted" %}
+                        <span class="badge badge-danger">Restricted</span>
+                    {% elif document.access_level == "public" %}
+                        <span class="badge badge-success">Public</span>
+                    {% else %}
+                        <span class="badge badge-green">Internal</span>
+                    {% endif %}
+                </div>
+
+                <a href="{% url 'document_detail' document.id %}" class="btn-green-full">Open Document</a>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            No documents found.
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

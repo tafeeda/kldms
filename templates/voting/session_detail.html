@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>{{ session.vote_number }}</h1>
+        <p>{{ session.title }}</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'vote_session_list' %}" class="btn-white">Back</a>
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'vote_session_update' session.id %}" class="btn-white">Edit</a>
+            <a href="{% url 'vote_bulk_mark' session.id %}" class="btn-white">Bulk Vote</a>
+            <a href="{% url 'vote_add_record' session.id %}" class="btn-white">Add Single Vote</a>
+            <a href="{% url 'vote_compute_outcome' session.id %}" class="btn-white">Compute Outcome</a>
+            <a href="{% url 'vote_session_toggle_open' session.id %}" class="btn-white">
+                {% if session.is_open %}Close{% else %}Open{% endif %}
+            </a>
+            <a href="{% url 'vote_session_toggle_lock' session.id %}" class="btn-white">
+                {% if session.is_locked %}Unlock{% else %}Lock{% endif %}
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="dashboard-card">
+        <span class="card-label">Yes</span>
+        <h2>{{ yes_count }}</h2>
+        <p>Members voted yes</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">No</span>
+        <h2>{{ no_count }}</h2>
+        <p>Members voted no</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Abstain</span>
+        <h2>{{ abstain_count }}</h2>
+        <p>Members abstained</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Total Votes</span>
+        <h2>{{ total_votes }}</h2>
+        <p>Total recorded votes</p>
+    </div>
+</div>
+
+<div class="details-card" style="margin-top: 24px;">
+    <h3>Vote Session Information</h3>
+
+    <div class="details-grid">
+        <div>
+            <span>Vote Type</span>
+            <strong>{{ session.get_vote_type_display }}</strong>
+        </div>
+
+        <div>
+            <span>Vote Method</span>
+            <strong>{{ session.get_vote_method_display }}</strong>
+        </div>
+
+        <div>
+            <span>Outcome</span>
+            <strong>{{ session.get_outcome_display }}</strong>
+        </div>
+
+        <div>
+            <span>Vote Date</span>
+            <strong>{{ session.vote_date|date:"d M Y" }}</strong>
+        </div>
+
+        <div>
+            <span>Sitting</span>
+            <strong>{{ session.sitting|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Bill</span>
+            <strong>{{ session.bill|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Motion</span>
+            <strong>{{ session.motion|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Resolution</span>
+            <strong>{{ session.resolution|default:"-" }}</strong>
+        </div>
+
+        <div>
+            <span>Open</span>
+            <strong>{% if session.is_open %}Yes{% else %}No{% endif %}</strong>
+        </div>
+
+        <div>
+            <span>Locked</span>
+            <strong>{% if session.is_locked %}Yes{% else %}No{% endif %}</strong>
+        </div>
+
+        <div>
+            <span>Public</span>
+            <strong>{% if session.is_public %}Yes{% else %}No{% endif %}</strong>
+        </div>
+
+        <div>
+            <span>Created By</span>
+            <strong>{{ session.created_by|default:"-" }}</strong>
+        </div>
+    </div>
+
+    <h3>Description</h3>
+    <p class="bio-text">{{ session.description|default:"No description added." }}</p>
+
+    <h3>Decision Summary</h3>
+    <p class="bio-text">{{ session.decision_summary|default:"No decision summary recorded yet." }}</p>
+
+    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+        <a href="{% url 'vote_session_toggle_public' session.id %}" class="btn-green-lg">
+            {% if session.is_public %}Unpublish Vote Result{% else %}Publish Vote Result{% endif %}
+        </a>
+    {% endif %}
+</div>
+
+<div class="dashboard-panel">
+    <h3>Vote Records</h3>
+
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Constituency</th>
+                    <th>Party</th>
+                    <th>Choice</th>
+                    <th>Remarks</th>
+                    <th>Voted At</th>
+                    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                        <th>Action</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for record in session.records.all %}
+                    <tr>
+                        <td>{{ record.member }}</td>
+                        <td>{{ record.member.constituency|default:"-" }}</td>
+                        <td>{{ record.member.political_party.abbreviation|default:"-" }}</td>
+                        <td>
+                            {% if record.choice == "yes" %}
+                                <span class="badge badge-success">Yes</span>
+                            {% elif record.choice == "no" %}
+                                <span class="badge badge-danger">No</span>
+                            {% else %}
+                                <span class="badge badge-green">Abstain</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.remarks|default:"-" }}</td>
+                        <td>{{ record.voted_at|date:"d M Y, h:i A" }}</td>
+
+                        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+                            <td>
+                                {% if not session.is_locked and session.is_open %}
+                                    <a href="{% url 'vote_update_record' record.id %}" class="btn-sm btn-green">Edit</a>
+                                {% else %}
+                                    <span class="badge badge-danger">Locked/Closed</span>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">No vote record added yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

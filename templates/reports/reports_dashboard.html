@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Reports & Analytics</h1>
+        <p>Legislative performance, attendance, voting, documents, and public transparency analytics.</p>
+    </div>
+
+    <a href="{% url 'printable_report' %}" target="_blank" class="btn-white">Printable Report</a>
+</div>
+
+<div class="dashboard-grid">
+    <div class="dashboard-card">
+        <span class="card-label">Members</span>
+        <h2>{{ total_members }}</h2>
+        <p>{{ active_members }} active members</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Committees</span>
+        <h2>{{ total_committees }}</h2>
+        <p>Total committees</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Bills</span>
+        <h2>{{ total_bills }}</h2>
+        <p>{{ passed_bills }} passed, {{ public_bills }} public</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Motions</span>
+        <h2>{{ total_motions }}</h2>
+        <p>{{ adopted_motions }} adopted motions</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Resolutions</span>
+        <h2>{{ total_resolutions }}</h2>
+        <p>{{ public_resolutions }} public resolutions</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Sittings</span>
+        <h2>{{ total_sittings }}</h2>
+        <p>{{ completed_sittings }} completed sittings</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Votes</span>
+        <h2>{{ total_vote_sessions }}</h2>
+        <p>{{ carried_votes }} carried votes</p>
+    </div>
+
+    <div class="dashboard-card">
+        <span class="card-label">Documents</span>
+        <h2>{{ total_documents }}</h2>
+        <p>{{ public_documents }} public documents</p>
+    </div>
+</div>
+
+<div class="analytics-grid">
+    <div class="chart-card">
+        <h3>Bills by Status</h3>
+        <canvas id="billStatusChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h3>Motions by Status</h3>
+        <canvas id="motionStatusChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h3>Resolutions by Status</h3>
+        <canvas id="resolutionStatusChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h3>Attendance Summary</h3>
+        <canvas id="attendanceChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h3>Voting Choices</h3>
+        <canvas id="voteChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h3>Documents by Access Level</h3>
+        <canvas id="documentChart"></canvas>
+    </div>
+</div>
+
+{{ bill_status_labels|json_script:"billStatusLabels" }}
+{{ bill_status_values|json_script:"billStatusValues" }}
+
+{{ motion_status_labels|json_script:"motionStatusLabels" }}
+{{ motion_status_values|json_script:"motionStatusValues" }}
+
+{{ resolution_status_labels|json_script:"resolutionStatusLabels" }}
+{{ resolution_status_values|json_script:"resolutionStatusValues" }}
+
+{{ attendance_status_labels|json_script:"attendanceStatusLabels" }}
+{{ attendance_status_values|json_script:"attendanceStatusValues" }}
+
+{{ vote_choice_labels|json_script:"voteChoiceLabels" }}
+{{ vote_choice_values|json_script:"voteChoiceValues" }}
+
+{{ document_access_labels|json_script:"documentAccessLabels" }}
+{{ document_access_values|json_script:"documentAccessValues" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+function getJson(id) {
+    return JSON.parse(document.getElementById(id).textContent);
+}
+
+function makeChart(canvasId, labelsId, valuesId, type = "bar") {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const labels = getJson(labelsId);
+    const values = getJson(valuesId);
+
+    new Chart(canvas, {
+        type: type,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Total",
+                data: values,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: type !== "bar"
+                }
+            },
+            scales: type === "bar" ? {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            } : {}
+        }
+    });
+}
+
+makeChart("billStatusChart", "billStatusLabels", "billStatusValues", "bar");
+makeChart("motionStatusChart", "motionStatusLabels", "motionStatusValues", "bar");
+makeChart("resolutionStatusChart", "resolutionStatusLabels", "resolutionStatusValues", "bar");
+makeChart("attendanceChart", "attendanceStatusLabels", "attendanceStatusValues", "doughnut");
+makeChart("voteChart", "voteChoiceLabels", "voteChoiceValues", "doughnut");
+makeChart("documentChart", "documentAccessLabels", "documentAccessValues", "doughnut");
+</script>
+
+{% endblock %}

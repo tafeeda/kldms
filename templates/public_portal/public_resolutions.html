@@ -1,0 +1,26 @@
+{% extends "public_portal/public_base.html" %}
+
+{% block public_content %}
+
+<section class="public-page">
+    <h1>Published Resolutions</h1>
+    <p>Public resolutions approved for citizen access.</p>
+
+    {% include "public_portal/partials/public_search_filter.html" %}
+
+    <div class="public-list">
+        {% for resolution in resolutions %}
+            <div class="public-list-card">
+                <span>Resolution</span>
+                <h3>{{ resolution.resolution_number }}</h3>
+                <h4>{{ resolution.title }}</h4>
+                <p>{{ resolution.description|truncatechars:220 }}</p>
+                <small>Status: {{ resolution.get_status_display }} | Date Adopted: {{ resolution.date_adopted|date:"d M Y"|default:"-" }}</small>
+            </div>
+        {% empty %}
+            <div class="public-empty">No published resolutions found.</div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "public_portal/public_base.html" %}
+
+{% block public_content %}
+
+<section class="public-page">
+    <h1>Published Motions</h1>
+    <p>Public motions approved for citizen access.</p>
+
+    {% include "public_portal/partials/public_search_filter.html" %}
+
+    <div class="public-list">
+        {% for motion in motions %}
+            <div class="public-list-card">
+                <span>Motion</span>
+                <h3>{{ motion.motion_number }}</h3>
+                <h4>{{ motion.title }}</h4>
+                <p>{{ motion.description|truncatechars:220 }}</p>
+                <small>Sponsor: {{ motion.sponsor|default:"-" }} | Status: {{ motion.get_status_display }}</small>
+            </div>
+        {% empty %}
+            <div class="public-empty">No published motions found.</div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

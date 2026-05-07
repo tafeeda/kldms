@@ -1,0 +1,26 @@
+<header class="topbar">
+    <button class="menu-toggle" id="menuToggle">☰</button>
+
+    <div class="search-wrapper">
+        <input
+            type="text"
+            id="masterSearchInput"
+            class="master-search"
+            placeholder="Search members, bills, motions, resolutions, sittings, documents..."
+            autocomplete="off"
+        >
+        <div id="masterSearchDropdown" class="search-dropdown"></div>
+    </div>
+
+    <div class="user-area">
+        <div class="user-info">
+            <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+            <small>{{ request.user.profile.get_role_display }}</small>
+        </div>
+
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </div>
+</header>

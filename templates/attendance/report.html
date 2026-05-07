@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Attendance Report</h1>
+        <p>View attendance performance across plenary and committee sessions.</p>
+    </div>
+
+    <a href="{% url 'attendance_session_list' %}" class="btn-white">Back</a>
+</div>
+
+<div class="filter-card">
+    <form method="get" class="filter-form">
+        <select name="member">
+            <option value="">All Members</option>
+            {% for member in members %}
+                <option value="{{ member.id }}" {% if member_id == member.id|stringformat:"s" %}selected{% endif %}>
+                    {{ member }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="type">
+            <option value="">All Types</option>
+            {% for value, label in type_choices %}
+                <option value="{{ value }}" {% if attendance_type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Generate</button>
+
+        {% if member_id or attendance_type %}
+            <a href="{% url 'attendance_report' %}">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="dashboard-panel">
+    <h3>Summary</h3>
+
+    <div class="summary-pills">
+        {% for item in summary %}
+            <div class="summary-pill">
+                <span>{{ item.status|title }}</span>
+                <strong>{{ item.total }}</strong>
+            </div>
+        {% empty %}
+            <p>No attendance summary available.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Session</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for record in records %}
+                    <tr>
+                        <td>{{ record.member }}</td>
+                        <td>{{ record.session.title }}</td>
+                        <td>{{ record.session.get_attendance_type_display }}</td>
+                        <td>{{ record.session.attendance_date|date:"d M Y" }}</td>
+                        <td>
+                            {% if record.status == "present" %}
+                                <span class="badge badge-success">Present</span>
+                            {% elif record.status == "absent" %}
+                                <span class="badge badge-danger">Absent</span>
+                            {% elif record.status == "late" %}
+                                <span class="badge badge-green">Late</span>
+                            {% else %}
+                                <span class="badge badge-green">Excused</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.remarks|default:"-" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">No attendance records found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

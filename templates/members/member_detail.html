@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>{{ member.full_name }}</h1>
+        <p>{{ member.position_title|default:"Honourable Member" }}</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{% url 'member_list' %}" class="btn-white">Back</a>
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'member_update' member.id %}" class="btn-white">Edit</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="profile-layout">
+    <div class="profile-card">
+        {% if member.photo %}
+            <img src="{{ member.photo.url }}" alt="{{ member.full_name }}" class="profile-main-photo">
+        {% else %}
+            <div class="profile-main-placeholder">
+                {{ member.first_name|first }}{{ member.last_name|first }}
+            </div>
+        {% endif %}
+
+        <h2>{{ member.full_name }}</h2>
+        <p>{{ member.position_title|default:"Honourable Member" }}</p>
+
+        {% if member.status == "active" %}
+            <span class="badge badge-success">Active</span>
+        {% elif member.status == "former" %}
+            <span class="badge badge-green">Former</span>
+        {% else %}
+            <span class="badge badge-danger">Suspended</span>
+        {% endif %}
+
+        {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+            <a href="{% url 'member_toggle_publish' member.id %}" class="btn-green-full">
+                {% if member.is_published %}Unpublish{% else %}Publish{% endif %}
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="details-card">
+        <h3>Member Information</h3>
+
+        <div class="details-grid">
+            <div>
+                <span>Constituency</span>
+                <strong>{{ member.constituency|default:"-" }}</strong>
+            </div>
+
+            <div>
+                <span>Political Party</span>
+                <strong>{{ member.political_party|default:"-" }}</strong>
+            </div>
+
+            <div>
+                <span>Phone</span>
+                <strong>{{ member.phone|default:"-" }}</strong>
+            </div>
+
+            <div>
+                <span>Email</span>
+                <strong>{{ member.email|default:"-" }}</strong>
+            </div>
+
+            <div>
+                <span>Date Sworn In</span>
+                <strong>{{ member.date_sworn_in|date:"d M Y"|default:"-" }}</strong>
+            </div>
+
+            <div>
+                <span>End Date</span>
+                <strong>{{ member.end_date|date:"d M Y"|default:"-" }}</strong>
+            </div>
+
+            <div>
+                <span>Published</span>
+                <strong>{% if member.is_published %}Yes{% else %}No{% endif %}</strong>
+            </div>
+
+            <div>
+                <span>Display Order</span>
+                <strong>{{ member.display_order }}</strong>
+            </div>
+        </div>
+
+        <h3>Biography</h3>
+        <p class="bio-text">{{ member.biography|default:"No biography added yet." }}</p>
+    </div>
+</div>
+
+{% endblock %}

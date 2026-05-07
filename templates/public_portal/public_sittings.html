@@ -1,0 +1,26 @@
+{% extends "public_portal/public_base.html" %}
+
+{% block public_content %}
+
+<section class="public-page">
+    <h1>Published Plenary Sittings</h1>
+    <p>Public sittings and plenary records approved for citizens.</p>
+
+    {% include "public_portal/partials/public_search_filter.html" %}
+
+    <div class="public-list">
+        {% for sitting in sittings %}
+            <div class="public-list-card">
+                <span>Sitting</span>
+                <h3>{{ sitting.sitting_number }}</h3>
+                <h4>{{ sitting.title }}</h4>
+                <p>{{ sitting.description|default:"No description available." }}</p>
+                <small>Date: {{ sitting.sitting_date|date:"d M Y" }} | Venue: {{ sitting.venue }} | Status: {{ sitting.get_status_display }}</small>
+            </div>
+        {% empty %}
+            <div class="public-empty">No published sittings found.</div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Resolutions</h1>
+        <p>Manage adopted resolutions, decision summaries, implementation status, and documents.</p>
+    </div>
+
+    {% if request.user.profile.role == "super_admin" or request.user.profile.role == "clerk" or request.user.profile.role == "deputy_clerk" %}
+        <a href="{% url 'resolution_create' %}" class="btn-white">+ Add Resolution</a>
+    {% endif %}
+</div>
+
+<div class="filter-card">
+    <form method="get" class="filter-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search resolution title, number, related motion...">
+
+        <select name="status">
+            <option value="">All Status</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+
+        {% if query or status %}
+            <a href="{% url 'resolution_list' %}">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Resolution Number</th>
+                    <th>Title</th>
+                    <th>Related Motion</th>
+                    <th>Status</th>
+                    <th>Public</th>
+                    <th>Date Adopted</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for resolution in resolutions %}
+                    <tr>
+                        <td>{{ resolution.resolution_number }}</td>
+                        <td>{{ resolution.title }}</td>
+                        <td>{{ resolution.related_motion.motion_number|default:"-" }}</td>
+                        <td><span class="badge badge-green">{{ resolution.get_status_display }}</span></td>
+                        <td>
+                            {% if resolution.is_public %}
+                                <span class="badge badge-success">Yes</span>
+                            {% else %}
+                                <span class="badge badge-danger">No</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ resolution.date_adopted|date:"d M Y"|default:"-" }}</td>
+                        <td>
+                            <a href="{% url 'resolution_detail' resolution.id %}" class="btn-sm btn-green">Open</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">No resolutions found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

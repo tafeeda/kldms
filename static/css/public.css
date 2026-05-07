@@ -1,0 +1,468 @@
+:root {
+    --green: #0B6B3A;
+    --dark-green: #064E2A;
+    --light-green: #E8F5EE;
+    --white: #FFFFFF;
+    --black: #111827;
+    --gray: #F3F4F6;
+    --border: #E5E7EB;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--gray);
+    color: var(--black);
+}
+
+a {
+    text-decoration: none;
+}
+
+.public-header {
+    background: var(--green);
+    color: white;
+    padding: 18px 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.public-header h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.public-header p {
+    margin: 4px 0 0;
+    opacity: 0.9;
+}
+
+.public-nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.public-nav a {
+    color: white;
+    font-weight: 700;
+    opacity: 0.95;
+}
+
+.public-nav a:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+.public-login-btn {
+    background: white;
+    color: var(--green) !important;
+    padding: 10px 16px;
+    border-radius: 14px;
+    font-weight: 900;
+}
+
+.public-hero {
+    padding: 90px 7%;
+    background:
+        linear-gradient(rgba(6, 78, 42, 0.88), rgba(6, 78, 42, 0.88)),
+        radial-gradient(circle at top left, #22c55e, transparent 35%),
+        radial-gradient(circle at bottom right, #111827, transparent 35%);
+    color: white;
+    text-align: center;
+}
+
+.public-hero h2 {
+    font-size: 44px;
+    max-width: 1000px;
+    margin: 0 auto 18px;
+}
+
+.public-hero p {
+    max-width: 850px;
+    margin: auto;
+    font-size: 18px;
+    line-height: 1.7;
+}
+
+.public-search-box {
+    max-width: 700px;
+    margin: 32px auto 0;
+    display: flex;
+    background: white;
+    border-radius: 20px;
+    padding: 8px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+}
+
+.public-search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 15px;
+    border-radius: 16px;
+    font-size: 16px;
+}
+
+.public-search-box button {
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 0 24px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.public-stats {
+    padding: 35px 7%;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+}
+
+.public-stats div {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.07);
+}
+
+.public-stats strong {
+    display: block;
+    color: var(--green);
+    font-size: 34px;
+}
+
+.public-stats span {
+    color: #6B7280;
+    font-weight: 700;
+}
+
+.public-cards {
+    padding: 20px 7% 50px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.public-card {
+    background: white;
+    padding: 28px;
+    border-radius: 24px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    color: var(--black);
+    transition: 0.2s ease;
+}
+
+.public-card:hover {
+    transform: translateY(-5px);
+}
+
+.public-card h3 {
+    color: var(--green);
+    margin-top: 0;
+}
+
+.public-page {
+    padding: 45px 7%;
+}
+
+.public-page h1 {
+    margin: 0;
+    color: var(--green);
+    font-size: 36px;
+}
+
+.public-page > p {
+    color: #6B7280;
+    font-size: 17px;
+}
+
+.public-inline-search {
+    background: white;
+    border-radius: 20px;
+    padding: 14px;
+    display: flex;
+    gap: 10px;
+    margin: 25px 0;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+.public-inline-search input {
+    flex: 1;
+    padding: 13px 15px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    outline: none;
+}
+
+.public-inline-search button {
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: 13px 18px;
+    border-radius: 14px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.public-inline-search a {
+    color: var(--green);
+    font-weight: 800;
+    align-self: center;
+}
+
+.public-inline-search select {
+    padding: 13px 15px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    outline: none;
+    background: white;
+}
+
+.public-list {
+    display: grid;
+    gap: 18px;
+}
+
+.public-list-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.public-list-card span {
+    display: inline-block;
+    color: var(--green);
+    background: var(--light-green);
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.public-list-card h3 {
+    color: var(--green);
+    margin-bottom: 5px;
+}
+
+.public-list-card h4 {
+    margin-top: 0;
+    font-size: 20px;
+}
+
+.public-list-card p {
+    color: #374151;
+    line-height: 1.7;
+}
+
+.public-list-card small {
+    color: #6B7280;
+    font-weight: 700;
+}
+
+.public-card-btn {
+    display: inline-block;
+    margin-top: 15px;
+    background: var(--green);
+    color: white;
+    padding: 11px 16px;
+    border-radius: 14px;
+    font-weight: 900;
+}
+
+.public-empty {
+    background: white;
+    padding: 30px;
+    border-radius: 24px;
+    color: #6B7280;
+}
+
+.public-footer {
+    text-align: center;
+    padding: 20px;
+    background: white;
+    color: #6B7280;
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 1000px) {
+    .public-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .public-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .public-hero h2 {
+        font-size: 34px;
+    }
+}
+
+@media (max-width: 650px) {
+    .public-header {
+        align-items: flex-start;
+    }
+
+    .public-nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .public-search-box,
+    .public-inline-search {
+        flex-direction: column;
+    }
+
+    .public-search-box button {
+        padding: 14px;
+    }
+
+    .public-stats,
+    .public-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .public-hero {
+        padding: 60px 7%;
+    }
+
+    .public-hero h2 {
+        font-size: 28px;
+    }
+}
+
+
+.public-official-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.public-official-card {
+    background: white;
+    border-radius: 26px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.07);
+    transition: 0.2s ease;
+}
+
+.public-official-card:hover {
+    transform: translateY(-5px);
+}
+
+.public-official-photo {
+    height: 270px;
+    background: var(--light-green);
+    position: relative;
+}
+
+.public-official-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.public-official-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--green), var(--dark-green));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 52px;
+    font-weight: 900;
+}
+
+.public-status {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.public-status.current {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.public-status.former {
+    background: #F3F4F6;
+    color: #374151;
+}
+
+.public-official-body {
+    padding: 22px;
+}
+
+.public-official-body span {
+    color: var(--green);
+    background: var(--light-green);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.public-official-body h3 {
+    margin: 14px 0 5px;
+    font-size: 20px;
+}
+
+.public-official-body h4 {
+    margin: 0 0 12px;
+    color: var(--green);
+}
+
+.public-official-body p {
+    color: #374151;
+    line-height: 1.6;
+}
+
+.public-official-meta {
+    display: grid;
+    gap: 6px;
+    color: #6B7280;
+}
+
+@media (max-width: 1200px) {
+    .public-official-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .public-official-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .public-official-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .public-inline-search select {
+        width: 100%;
+    }
+}
