@@ -1,7 +1,9 @@
-from .models import SystemSetting
+from .models import SystemSettings
 
 
 def system_settings(request):
+    settings = SystemSettings.objects.first()
+
     return {
-        "system_settings": SystemSetting.get_settings()
+        "system_settings": settings
     }

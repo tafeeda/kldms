@@ -8,6 +8,35 @@
 
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+    {% if system_settings.favicon %}
+    <link rel="icon" type="image/png" href="{{ system_settings.favicon.url }}">
+    {% endif %}
+
+    <style>
+        :root {
+            --primary-color:
+                {% if system_settings.primary_color %}
+                    {{ system_settings.primary_color }}
+                {% else %}
+                    #0B6B3A
+                {% endif %};
+
+            --secondary-color:
+                {% if system_settings.secondary_color %}
+                    {{ system_settings.secondary_color }}
+                {% else %}
+                    #FFFFFF
+                {% endif %};
+
+            --accent-color:
+                {% if system_settings.accent_color %}
+                    {{ system_settings.accent_color }}
+                {% else %}
+                    #111111
+                {% endif %};
+        }
+    </style>
 </head>
 <body>
 

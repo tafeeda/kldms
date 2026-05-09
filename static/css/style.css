@@ -27,7 +27,7 @@ a {
 .login-body {
     min-height: 100vh;
     background:
-        linear-gradient(rgba(6, 78, 42, 0.88), rgba(6, 78, 42, 0.88)),
+        linear-gradient(rgba(var(--primary-color, 6, 78, 42), 0.88), rgba(var(--primary-color, 6, 78, 42), 0.88)),
         radial-gradient(circle at top left, #22c55e, transparent 35%),
         radial-gradient(circle at bottom right, #111827, transparent 35%);
     display: flex;
@@ -51,8 +51,8 @@ a {
     width: 72px;
     height: 72px;
     border-radius: 24px;
-    background: white;
-    color: var(--green);
+    background: var(--secondary-color);
+    color: var(--primary-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -80,7 +80,7 @@ a {
 
 .login-card h2 {
     margin: 0;
-    color: var(--green);
+    color: var(--primary-color);
 }
 
 .login-card p {
@@ -104,15 +104,15 @@ a {
 }
 
 .login-card input:focus {
-    border-color: var(--green);
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 4px rgba(11, 107, 58, 0.12);
 }
 
 .login-card button {
     width: 100%;
     margin-top: 22px;
-    background: var(--green);
-    color: white;
+    background: var(--primary-color);
+    color: var(--secondary-color);
     border: none;
     padding: 14px;
     border-radius: 14px;
@@ -122,14 +122,14 @@ a {
 }
 
 .login-card button:hover {
-    background: var(--dark-green);
+    background: var(--accent-color);
 }
 
 .public-link {
     display: block;
     text-align: center;
     margin-top: 18px;
-    color: var(--green);
+    color: var(--primary-color);
     font-weight: 600;
 }
 
