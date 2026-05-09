@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Audit Logs</h1>
+        <p>Monitor user activities, security events, access attempts, IP addresses, and device fingerprints.</p>
+    </div>
+</div>
+
+<div class="filter-card">
+    <form method="get" class="filter-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search actor, module, description, IP, fingerprint...">
+
+        <select name="action">
+            <option value="">All Actions</option>
+            {% for value, label in action_choices %}
+                <option value="{{ value }}" {% if action == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="module">
+            <option value="">All Modules</option>
+            {% for item in modules %}
+                <option value="{{ item }}" {% if module == item %}selected{% endif %}>{{ item }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filter</button>
+
+        {% if query or action or module %}
+            <a href="{% url 'audit_log_list' %}">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="kldms-table">
+            <thead>
+                <tr>
+                    <th>Actor</th>
+                    <th>Action</th>
+                    <th>Module</th>
+                    <th>Description</th>
+                    <th>IP Address</th>
+                    <th>Device Fingerprint</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for log in logs %}
+                    <tr>
+                        <td>
+                            {% if log.actor %}
+                                <strong>{{ log.actor.username }}</strong><br>
+                                <small>{{ log.actor.get_full_name|default:"-" }}</small>
+                            {% else %}
+                                <span class="badge badge-danger">Anonymous</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="badge badge-green">{{ log.get_action_display }}</span>
+                        </td>
+
+                        <td>{{ log.module }}</td>
+
+                        <td>{{ log.description|default:"-" }}</td>
+
+                        <td>{{ log.ip_address|default:"-" }}</td>
+
+                        <td>
+                            {% if log.device_fingerprint %}
+                                <small>{{ log.device_fingerprint|slice:":18" }}...</small>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <td>{{ log.created_at|date:"d M Y, h:i A" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">No audit logs found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

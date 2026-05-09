@@ -34,7 +34,7 @@
         <a href="{% url 'reports_dashboard' %}" class="sidebar-link">Reports</a>
 
         {% if request.user.profile.role == "super_admin" %}
-            <a href="#" class="sidebar-link">Audit Logs</a>
+            <a href="{% url 'audit_log_list' %}" class="sidebar-link">Audit Logs</a>
             <a href="{% url 'system_settings' %}" class="sidebar-link">System Settings</a>
         {% endif %}
 
